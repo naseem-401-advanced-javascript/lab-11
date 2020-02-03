@@ -1,7 +1,7 @@
 'use strict'; 
 
-const base64 = require('./base-64');// first stage of security
-const users =require('.users.js')
+const base64 = require('base-64');// first stage of security
+const users =require('./server')
 
 //to ttach the base64 pw in the heder of req 
 module.exports=(req,res,next)=>{

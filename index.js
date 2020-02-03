@@ -4,7 +4,7 @@ const server = require('./auth/server.js');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
-const MONGOOSE_URI='mongodb://localhost:27017/serverVir'
+const MONGOOSE_URI='mongodb://localhost:3000/serverVir'
 
 dotenv.config();
 
