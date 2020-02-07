@@ -1,13 +1,18 @@
+/* eslint-disable no-undef */
+/*eslint-disable strict */
 'use strict';
 
-const server = require('./auth/server.js');
+require('dotenv');
+const server = require('./lib/server.js');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/lab11';
 
-const MONGOOSE_URI='mongodb://localhost:3000/serverVir'
+const options = {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+};
 
-dotenv.config();
+mongoose.connect(MONGODB_URI, options);
 
-mongoose.connect(MONGOOSE_URI, { useNewUrlParser: true, useCreateIndex:true,useUnifiedTopology:true });
-
-server.start();
+server.start(process.env.PORT);

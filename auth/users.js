@@ -1,33 +1,37 @@
+/* eslint-disable strict */
 'use strict';
 
-const bcryptjs =require('bcryptjs');
-const jws = require('jsonwebtoken');//return the output to ajson format
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-let SECRET= 'nasa1993';
+const SECRET = process.env.SECRET;
 
-//save all users
-let db ={};
-//each one info
-let users ={};
+const users = new mongoose.Schema({
+  username: { type: String, required: true },
+  password: { type: String, required: true },
+});
 
-users.save= async function(userInfoObject){
-    if(db[userInfoObject.username]){
-        userInfoObject.password = await bcryptjs.hash(userInfoObject.password,5);
-        db[userInfoObject.username]=userInfoObject;// save ( username, password ) into DB by the username 
-        return userInfoObject;
-    }
-return Promise.reject();
-}
+users.pre('save', async function () {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 5);
+  }
+  return Promise.reject();
+});
 
-users.authenticateUser =async function(user,pass){
-    let valid = await bcryptjs.compare(pass,db[user].password);
-    return valid?db[user]:Promise.reject();
-}
+users.statics.authenticateBasic = async function (user, pass) { /// I got confused to use eathier statcs or methods for this function
+  let valid = await bcrypt.compare(pass, this.password);
+  return valid ? user : Promise.reject();
+};
 
-users.generateToken =function(user){
-    let token = jwt.sign({username:user.username},SECRET);
-    return token;
-}
+users.methods.tokenGenerator = function () {
+  let token = {
+    id: this._id,
+  };
 
-users.list =()=>db;
-module.exports = users;
+  return jwt.sign(token, SECRET);
+};
+
+module.exports = mongoose.model('users', users);
+
+/// This Code based on class13 starter code
