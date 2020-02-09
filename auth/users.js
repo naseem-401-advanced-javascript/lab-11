@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const SECRET = process.env.SECRET;
+console.log(SECRET)
 
 const users = new mongoose.Schema({
   username: { type: String, required: true },
@@ -19,16 +20,27 @@ users.pre('save', async function () {
   return Promise.reject();
 });
 
-users.statics.authenticateBasic = async function (user, pass) { /// I got confused to use eathier statcs or methods for this function
-  let valid = await bcrypt.compare(pass, this.password);
-  return valid ? user : Promise.reject();
+users.statics.authenticater = function (auth) {
+  let query = { username: auth.user };
+  return this.findOne(query)
+    .then(user => {
+      return user.passwordComparator(auth.pass);
+    })
+    .catch(console.error)
 };
 
-users.methods.tokenGenerator = function () {
-  let token = {
-    id: this._id,
-  };
+users.methods.passwordComparator = function (pass) {
+  return bcrypt.compare(pass, this.password)
+    .then(valid => {
+      return valid ? this : null
+    });
+};
 
+users.methods.tokenGenerator = function (user) {
+  console.log('user.js', user)
+  let token = {
+    id: user._id,
+  };
   return jwt.sign(token, SECRET);
 };
 
