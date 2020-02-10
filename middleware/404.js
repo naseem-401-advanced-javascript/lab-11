@@ -5,7 +5,7 @@
 function notFoundHandler(req, res, next) {
   res.status(404);
   res.message = ' NOT FOUND';
-  res.json({ error: 'NOT FOUND' ,});
+  res.json({ error: 'NOT FOUND' });
 }
 
 module.exports = notFoundHandler;
